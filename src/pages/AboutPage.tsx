@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Wrench, Factory, Building, TruckFront } from 'lucide-react';
+import { Wrench, Factory, Building, Truck, Settings } from 'lucide-react';
 
 const AboutPage = () => {
   return (
@@ -119,7 +119,7 @@ const AboutPage = () => {
               {
                 title: "Innovation",
                 desc: "We continuously seek better solutions to meet evolving industry needs.",
-                icon: <Gear className="h-10 w-10 text-primary" />
+                icon: <Settings className="h-10 w-10 text-primary" />
               },
               {
                 title: "Integrity",
@@ -129,7 +129,7 @@ const AboutPage = () => {
               {
                 title: "Customer Focus",
                 desc: "We prioritize our customers' success and satisfaction above all else.",
-                icon: <TruckFront className="h-10 w-10 text-primary" />
+                icon: <Truck className="h-10 w-10 text-primary" />
               }
             ].map((value, index) => (
               <div key={index} className="bg-gray-50 p-6 rounded-lg text-center">

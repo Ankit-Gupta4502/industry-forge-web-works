@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
-import { Factory, Forklift, Gear, Wrench, ArrowRight } from 'lucide-react';
+import { Factory, Forklift, Settings, Wrench, ArrowRight } from 'lucide-react';
 
 const HomePage = () => {
   return (
@@ -60,7 +60,7 @@ const HomePage = () => {
                 desc: "Technical assistance from industry professionals with decades of experience." 
               },
               { 
-                icon: <Gear size={40} className="text-primary" />, 
+                icon: <Settings size={40} className="text-primary" />, 
                 title: "Custom Solutions", 
                 desc: "Tailored machinery configurations designed for your specific operations." 
               },
