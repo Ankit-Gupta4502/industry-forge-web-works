@@ -1,9 +1,10 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wrench, Search, Factory, Settings, Forklift, Building2 } from 'lucide-react';
+import { Wrench, Search, Factory, Settings, Forklift, Building2, SlidersHorizontal } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 const ProductsPage = () => {
   const productCategories = [
@@ -14,7 +15,7 @@ const ProductsPage = () => {
     { id: 'industrial-parts', label: 'Industrial Parts', icon: <Settings size={16} /> },
   ];
 
-  const products = [
+  const initialProducts = [
     {
       id: 1,
       name: 'Industrial Robot Arm',
@@ -89,6 +90,66 @@ const ProductsPage = () => {
     },
   ];
 
+  const [products, setProducts] = useState(initialProducts);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortOption, setSortOption] = useState('name-asc');
+  
+  // Effect for filtering and sorting products
+  useEffect(() => {
+    let filteredProducts = [...initialProducts];
+    
+    // Apply search filter
+    if (searchQuery) {
+      filteredProducts = filteredProducts.filter(product => 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Apply sorting
+    switch (sortOption) {
+      case 'name-asc':
+        filteredProducts.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'name-desc':
+        filteredProducts.sort((a, b) => b.name.localeCompare(a.name));
+        break;
+      case 'price-asc':
+        filteredProducts.sort((a, b) => {
+          const priceA = parseFloat(a.price.replace(/[^0-9.-]+/g, ''));
+          const priceB = parseFloat(b.price.replace(/[^0-9.-]+/g, ''));
+          return priceA - priceB;
+        });
+        break;
+      case 'price-desc':
+        filteredProducts.sort((a, b) => {
+          const priceA = parseFloat(a.price.replace(/[^0-9.-]+/g, ''));
+          const priceB = parseFloat(b.price.replace(/[^0-9.-]+/g, ''));
+          return priceB - priceA;
+        });
+        break;
+      default:
+        break;
+    }
+    
+    setProducts(filteredProducts);
+  }, [searchQuery, sortOption]);
+  
+  // Handle search input change
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  // Handle tab change to filter by category
+  const handleTabChange = (value: string) => {
+    if (value === 'all') {
+      setProducts(initialProducts);
+    } else {
+      const filtered = initialProducts.filter(product => product.category === value);
+      setProducts(filtered);
+    }
+  };
+
   return (
     <div>
       {/* Hero Section */}
@@ -115,17 +176,31 @@ const ProductsPage = () => {
                   type="search" 
                   placeholder="Search products..." 
                   className="pl-10"
+                  value={searchQuery}
+                  onChange={handleSearchChange}
                 />
               </div>
               <div className="flex gap-2">
-                <Button variant="outline">Filter</Button>
-                <Button variant="outline">Sort</Button>
+                <Select
+                  value={sortOption}
+                  onValueChange={(value) => setSortOption(value)}
+                >
+                  <SelectTrigger className="w-[180px]">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="name-asc">Name (A-Z)</SelectItem>
+                    <SelectItem value="name-desc">Name (Z-A)</SelectItem>
+                    <SelectItem value="price-asc">Price (Low to High)</SelectItem>
+                    <SelectItem value="price-desc">Price (High to Low)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
           </div>
 
           {/* Product Categories Tabs */}
-          <Tabs defaultValue="all" className="mb-12">
+          <Tabs defaultValue="all" className="mb-12" onValueChange={handleTabChange}>
             <TabsList className="mb-8">
               {productCategories.map((category) => (
                 <TabsTrigger key={category.id} value={category.id} className="flex items-center gap-2">
@@ -141,6 +216,11 @@ const ProductsPage = () => {
                 {products.map((product) => (
                   <ProductCard key={product.id} product={product} />
                 ))}
+                {products.length === 0 && (
+                  <div className="col-span-3 text-center py-10">
+                    <p className="text-lg text-gray-500">No products match your search criteria.</p>
+                  </div>
+                )}
               </div>
             </TabsContent>
             
@@ -153,6 +233,11 @@ const ProductsPage = () => {
                     .map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
+                  {products.filter(p => p.category === category.id).length === 0 && (
+                    <div className="col-span-3 text-center py-10">
+                      <p className="text-lg text-gray-500">No products match your search criteria in this category.</p>
+                    </div>
+                  )}
                 </div>
               </TabsContent>
             ))}
